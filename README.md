@@ -1,7 +1,7 @@
 # Decoder-Only Transformer, From Scratch
 
 A small decoder-only transformer (the architecture family behind GPT-style
-models) implemented from first principles in PyTorch — no `transformers`
+models) implemented from first principles in PyTorch, no `transformers`
 library, no pre-built attention layers. Multi-head causal self-attention,
 sinusoidal position encoding, feed-forward blocks, residual connections,
 and layer norm, stacked into a mini language model that learns to answer
@@ -10,7 +10,7 @@ country/capital questions from a handful of training examples.
 ## Why this exists
 
 I started from a tutorial ([StatQuest: Coding Transformers from Scratch](https://www.youtube.com/@statquest)
-by Josh Starmer) to understand the mechanics of a decoder-only transformer —
+by Josh Starmer) to understand the mechanics of a decoder-only transformer,
 his walkthrough is a genuinely good explanation of position encoding and
 masked self-attention. But the tutorial's model is intentionally minimal:
 one attention head, `d_model=2`, a single decoder block, trained on one
@@ -18,8 +18,8 @@ fact phrased two ways. That's the right size for a first explanation, and
 the wrong size to prove you understand anything about how the pieces
 scale or where they go wrong.
 
-So this project keeps the same starting concepts — attention, position
-encoding, a decoder block — but rebuilds them independently: my own code,
+So this project keeps the same starting concepts, attention, position
+encoding, a decoder block, but rebuilds them independently: my own code,
 own comments explaining the *why* rather than a line-by-line description
 of the *what*, multi-head attention instead of single-head, stacked
 layers instead of one, and a dataset built to actually need attention
@@ -37,7 +37,7 @@ paris is the capital of ?    -> france
 A model that just memorizes "the 3rd token predicts the 6th token" would
 fail the moment the country changes. To get every fact right in both
 directions, the model has to attend back to whichever token actually
-carries the answer — which is the entire point of self-attention, and
+carries the answer, which is the entire point of self-attention, and
 why this dataset is a better test of it than a single repeated fact.
 
 ## Architecture
@@ -55,7 +55,7 @@ mask per batch, so training can process multiple variable-length examples
 at once instead of one at a time.
 
 Training uses a hand-written PyTorch loop (`train.py`) rather than a
-training framework — every `zero_grad → forward → loss → backward → step`
+training framework, every `zero_grad → forward → loss → backward → step`
 is visible, which was the point: I wanted to actually see the mechanics,
 not have a framework hide them.
 
@@ -67,7 +67,7 @@ not have a framework hide them.
   **120/120 correct** across all 12 facts, both question directions.
 - `assets/attention_heatmap.png` shows the last block's attention for
   `capital of kenya ? <eos> nairobi`: the answer token attends back to
-  `kenya`, not to a fixed position — visual confirmation that the model
+  `kenya`, not to a fixed position, visual confirmation that the model
   is routing information through attention rather than memorizing slots.
 
 ## Files
@@ -101,12 +101,8 @@ python3 visualize_attention.py                     # regenerates the attention h
 - Add KV-caching to `generate.py` so decoding doesn't recompute
   attention over the whole prefix at every step.
 - Try ablating heads/layers on the current dataset to see how much
-  capacity 12 facts actually need — a cheap way to build intuition
+  capacity 12 facts actually need, a cheap way to build intuition
   about capacity vs. task complexity before touching anything bigger.
 
 ---
 
-*Built while preparing for [ARENA](https://www.arena.education/) — this
-project was about developing a working, hands-on understanding of
-transformer internals (attention, masking, position encoding) rather
-than treating them as a library import.*
